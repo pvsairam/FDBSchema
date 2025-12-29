@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fusion DB Schema - Oracle Fusion Documentation Ingestion</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Fusion DB Schema</h1>
+            <p class="subtitle">Oracle Fusion Cloud Documentation Ingestion Platform</p>
+            <p class="description">Safe, polite schema extraction for Text-to-SQL / NL2SQL agents</p>
+        </header>
+
+        <section class="control-panel">
+            <h2>Documentation Source</h2>
+            <div class="input-group">
+                <input type="url" id="tocUrl" placeholder="Enter Oracle Fusion TOC URL (e.g., https://docs.oracle.com/en/cloud/saas/financials/26a/oedmf/)" />
+                <button id="discoverBtn" class="btn btn-primary">Discover Tables</button>
+            </div>
+            <div class="quick-links">
+                <span>Quick Links:</span>
+                <a href="#" onclick="setUrl('https://docs.oracle.com/en/cloud/saas/financials/26a/oedmf/')">Financials 26A</a>
+                <a href="#" onclick="setUrl('https://docs.oracle.com/en/cloud/saas/human-resources/26a/oedmh/')">HCM 26A</a>
+            </div>
+        </section>
+
+        <section class="search-panel">
+            <h2>Quick Table Ingest</h2>
+            <p class="panel-description">Ingest a specific table on-demand (must run discovery first)</p>
+            <div class="input-group">
+                <input type="text" id="tableNameInput" placeholder="Enter table name (e.g., AP_INVOICES_ALL)" />
+                <button id="searchTableBtn" class="btn btn-primary">Search</button>
+                <button id="ingestTableBtn" class="btn btn-success">Ingest</button>
+            </div>
+            <div id="searchResults" class="search-results"></div>
+        </section>
+
+        <section class="action-panel">
+            <h2>Bulk Ingestion Control</h2>
+            <div class="button-group">
+                <button id="startBtn" class="btn btn-success" disabled>Start All</button>
+                <button id="pauseBtn" class="btn btn-warning" disabled>Pause</button>
+                <button id="resumeBtn" class="btn btn-info" disabled>Resume</button>
+                <button id="retryBtn" class="btn btn-secondary">Retry Failed</button>
+                <button id="resetBtn" class="btn btn-danger">Reset All</button>
+            </div>
+            <div id="statusIndicator" class="status-indicator">
+                <span class="status-dot idle"></span>
+                <span class="status-text">Idle</span>
+            </div>
+        </section>
+
+        <section class="progress-panel">
+            <h2>Progress</h2>
+            <div class="progress-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDiscovered">0</div>
+                    <div class="stat-label">Total Discovered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failedCount">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p class="current-table">Current: <span id="currentTable">-</span></p>
+        </section>
+
+        <section class="summary-panel">
+            <h2>Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-label">Tables Ingested:</span>
+                    <span class="summary-value" id="tablesIngested">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Columns Ingested:</span>
+                    <span class="summary-value" id="columnsIngested">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Last Processed:</span>
+                    <span class="summary-value" id="lastProcessed">-</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="query-panel">
+            <h2>SQL Query</h2>
+            <p class="panel-description">Run SELECT queries on the ingested schema data</p>
+            <div class="query-input-area">
+                <textarea id="sqlQuery" rows="3" placeholder="SELECT * FROM fusion_ingestion_state LIMIT 10;"></textarea>
+                <button id="runQueryBtn" class="btn btn-primary">Run Query</button>
+            </div>
+            <div class="query-presets">
+                <span>Presets:</span>
+                <button class="btn btn-small" onclick="setQuery('SELECT status, COUNT(*) as count FROM fusion_ingestion_state GROUP BY status;')">Status Summary</button>
+                <button class="btn btn-small" onclick="setQuery('SELECT table_name, status FROM fusion_ingestion_state LIMIT 20;')">First 20 Tables</button>
+                <button class="btn btn-small" onclick="setQuery('SELECT * FROM fusion_tables LIMIT 10;')">Ingested Tables</button>
+                <button class="btn btn-small" onclick="setQuery('SELECT * FROM fusion_columns LIMIT 20;')">Ingested Columns</button>
+            </div>
+            <div id="queryResults" class="query-results"></div>
+        </section>
+
+        <section class="log-panel">
+            <h2>Activity Log</h2>
+            <div class="log-container" id="logContainer">
+                <p class="log-placeholder">Logs will appear here...</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>Fusion DB Schema - Production-grade documentation ingestion for Oracle Fusion Cloud</p>
+            <p class="compliance">Respects rate limits (7-10s delay) | Single-threaded | Idempotent | Resumable</p>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
